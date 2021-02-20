@@ -1,4 +1,5 @@
 import keras
+import numpy as np
 from keras import backend
 from tensorflow.keras.layers import Bidirectional
 # from keras.regularizers import l2
@@ -42,10 +43,11 @@ def create_model(x_train, y_train):
     return model
 
 
-def create_model_stateful(x_train, y_train, batch_size):
+def create_model_stateful(time_steps, features, output_length, batch_size):
+
     model = Sequential()
     model.add(
-        LSTM(512, batch_input_shape=(batch_size, x_train.shape[1], x_train.shape[2]), kernel_initializer='uniform',
+        LSTM(512, batch_input_shape=(batch_size, time_steps, features), kernel_initializer='uniform',
              stateful=True, return_sequences=False))
     # model.add(LSTM(64, batch_input_shape=(batch_size, x_train.shape[1], x_train.shape[2]), kernel_initializer='uniform',
     #                 stateful=True))
@@ -58,7 +60,7 @@ def create_model_stateful(x_train, y_train, batch_size):
     # model.add(Dense(3, activation='relu', kernel_regularizer=l2(0.01), bias_regularizer=l2(0.01)))
 
     model.add(Dropout(0.5))
-    model.add(Dense(y_train.shape[1], ))
+    model.add(Dense(output_length, ))
     model.add(Activation('relu'))
     adam = keras.optimizers.Adam(lr=0.0001)
     model.compile(loss='mean_squared_error', optimizer=adam, metrics=[rmse])
@@ -112,7 +114,7 @@ def run_model(x_train, y_train, x_valid=None, y_valid=None, batch_n=None, EPOCHS
     batch_n = 32 if batch_n is None else batch_n
     EPOCHS = 1 if EPOCHS is None else EPOCHS
     # model = create_model(x_train,y_train)
-    model = create_model_stateful(x_train, y_train, batch_n)
+    model = create_model_stateful(time_steps = x_train.shape[1], features= x_train.shape[2], output_length= y_train.shape[1], batch_size=batch_n)
     # model = create_model_bilstm(128)
     # model = create_model_stateful_bidirectional(x_train, y_train, batch_n)
 

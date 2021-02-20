@@ -1,0 +1,35 @@
+{
+  "data": {
+    "url": "https://raw.githubusercontent.com/kpandey16/test/main/GHI/final1.csv",
+    "index_col": 0,
+    "look_back": 1056,
+    "look_ahead": 1056,
+    "normalise": true,
+  },
+
+  "training": {
+    "epochs": 100,
+    "batch_size": 64,
+    "start_date": "2015-01-01 00:15:00",
+    "end_date": "2019-12-31 23:45:00"
+
+  },
+
+  "test": {
+
+
+  },
+
+  "model": {
+    "loss": 'rmse',
+    "layers": [
+      {
+        "type": "LSTM",
+        "neurons": 512,
+        "return_seq": true,
+        "time_steps": 1056,
+        "stateful": true
+      }
+    ]
+  }
+}
