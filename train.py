@@ -18,7 +18,7 @@ pd.set_option('mode.chained_assignment', None)
 df = pd.read_csv("./new_file.csv", index_col=0, parse_dates=True)
 print(df.shape)
 
-train_st = "2019-10-01 00:15:00"
+train_st = "2019-12-01 00:15:00"
 train_end = "2019-12-31 23:45:00"
 
 trainset = df.loc[train_st:train_end, :]
@@ -36,8 +36,8 @@ processing_steps.append(("Scale", ScaleTransformer(target_col_name=Configs.targe
 # processing_steps.append(("TrainDataShape", TrainDataTransformer(look_ahead=2, look_back=2, targetName=None)))
 
 
-look_back = 4 * 24 * 2
-look_ahead = 4 * 24 * 2
+look_back = 4
+look_ahead = 2
 
 
 def main():
@@ -69,7 +69,7 @@ def main():
 
     print("==============================================")
 
-    run_model(x_train, y_train, y_valid=y_valid, x_valid=x_valid, batch_n=64, EPOCHS=2)
+    run_model(x_train, y_train, y_valid=y_valid, x_valid=x_valid, batch_n=64, EPOCHS=20)
 
 
 if __name__ == "__main__":

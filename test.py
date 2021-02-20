@@ -32,19 +32,27 @@ scaler_y = load(open('./scaler_y.pkl', 'rb'))
 
 mae_arr = {}
 rmse_arr = {}
+
+"""
+11 days -- '2020-12-01 00:00:00':'2020-12-11 23:45:00'
+7 days -- '2020-12-01 00:00:00':'2020-12-07 23:45:00'
+1 day -- '2020-12-01 00:00:00':'2020-12-01 23:45:00'
+"""
+
 for i in range(1, 13):
   test_st = "2020-" + "{:02d}".format(i) + "-01 00:00:00"
-  test_end = "2020-"+ "{:02d}".format(i) +"-02 23:45:00"
+  test_end = "2020-"+ "{:02d}".format(i) +"-11 23:45:00"
 
   y_true = train.df.loc[test_st:test_end, 'TOA']
+  print("main shape: ", train.df.loc[test_st:test_end, 'TOA'].shape)
 
   test_past_st = train.df.index.get_loc(test_st)
   ttest2 = train.df.iloc[test_past_st - train.look_back : test_past_st, :]
 
   test2_scaled = test_pipe.transform(ttest2)
-  print("Pipeline processed: ", test2_scaled.shape)
+  # print("Pipeline processed: ", test2_scaled.shape)
   tx, ty = utils.get_X_y(X=test2_scaled, look_back=train.look_back, look_ahead=None, test_data=True)
-  print("test_X", tx.shape)
+  # print("test_X", tx.shape)
 
   test2_pred = pred_model.predict(tx, batch_size=1)
   test2_pred = scaler_y.inverse_transform(test2_pred)
