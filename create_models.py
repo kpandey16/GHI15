@@ -102,8 +102,8 @@ def run_model(x_train, y_train, x_valid=None, y_valid=None, batch_n=None, EPOCHS
     best_model = ModelCheckpoint('./best_model.h5', monitor='val_rmse', mode='min', save_best_only=True, verbose=1)
 
     batch_n = 64
-    model = create_model(x_train,y_train)
-    # model = create_model_stateful(x_train, y_train, batch_n)
+    # model = create_model(x_train,y_train)
+    model = create_model_stateful(x_train, y_train, batch_n)
     # model = create_model_bilstm(128)
     # model = create_model_stateful_bidirectional(x_train, y_train, batch_n)
     EPOCHS = 1 if EPOCHS is None else EPOCHS
