@@ -8,6 +8,7 @@ from keras.layers import Dense, Dropout
 from keras.layers import LSTM
 from keras.layers import Activation
 from tensorflow.python.keras.callbacks import ModelCheckpoint
+from keras.callbacks import EarlyStopping
 
 
 def rmse(y_true, y_pred):
@@ -97,23 +98,31 @@ def create_model_stateful_bidirectional(x_train, y_train, batch):
 
 
 def run_model(x_train, y_train, x_valid=None, y_valid=None, batch_n=None, EPOCHS=None):
-    from keras.callbacks import EarlyStopping
+
+    # tf.config.gpu.set_per_process_memory_fraction(0.75)
+    # tf.config.gpu.set_per_process_memory_growth(True)
+
+    gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+    for device in gpu_devices: tf.config.experimental.set_memory_growth(device, True)
+
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25, restore_best_weights=True)
     best_model = ModelCheckpoint('./best_model.h5', monitor='val_rmse', mode='min', save_best_only=True, verbose=1)
 
-    batch_n = 64
+    # batch_n = 64
+    batch_n = 32 if batch_n is None else batch_n
+    EPOCHS = 1 if EPOCHS is None else EPOCHS
     # model = create_model(x_train,y_train)
     model = create_model_stateful(x_train, y_train, batch_n)
     # model = create_model_bilstm(128)
     # model = create_model_stateful_bidirectional(x_train, y_train, batch_n)
-    EPOCHS = 1 if EPOCHS is None else EPOCHS
+
     history = None
     # history = model.fit(x_train, y_train, epochs=EPOCHS, batch_size=batch_n, validation_data=(x_valid, y_valid), verbose=2, shuffle=False,
     #                   callbacks=[es, ])
 
     tf.keras.backend.clear_session()
 
-    history = model.fit(x_train, y_train, epochs=EPOCHS, batch_size=batch_n, validation_split=0.2,
+    history = model.fit(x_train, y_train, epochs=EPOCHS, batch_size=batch_n, validation_data=(x_valid, y_valid),
                         verbose=2, shuffle=False, callbacks=[es, best_model])
 
     # history = model.fit(x_train, y_train, epochs=EPOCHS, batch_size=batch_n, verbose=2, shuffle=False,
