@@ -71,26 +71,28 @@ class ColumnsSelectTransformer(BaseEstimator, TransformerMixin):
 
 
 class ScaleTransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, target_col_name):
+    def __init__(self, target_col_name, scaler_x, scaler_y):
         self.target_col_name = target_col_name
+        self.scaler_x = scaler_x
+        self.scaler_y = scaler_y
 
     def fit(self, df, y=None):
         return self;
 
     def transform(self, df, y=None):
-        scaler_x = MinMaxScaler(feature_range=(0.01, 0.99))
-        scaler_y = MinMaxScaler(feature_range=(0.01, 0.99))
+        # scaler_x = MinMaxScaler(feature_range=(0.01, 0.99))
+        # scaler_y = MinMaxScaler(feature_range=(0.01, 0.99))
 
         cols = list(df.columns)
         cols.remove(self.target_col_name)
 
-        scaled_x = scaler_x.fit_transform(df.loc[:, cols].values)
-        scaled_y = scaler_y.fit_transform(df.loc[:, self.target_col_name].values.reshape(-1, 1))
+        scaled_x = self.scaler_x.fit_transform(df.loc[:, cols].values)
+        scaled_y = self.scaler_y.fit_transform(df.loc[:, self.target_col_name].values.reshape(-1, 1))
 
         scaled_data = np.column_stack((scaled_x, scaled_y))
 
-        dump(scaler_x, open("./scaler_x.pkl", "wb"))
-        dump(scaler_y, open("./scaler_y.pkl", "wb"))
+        dump(self.scaler_x, open("./scaler_x.pkl", "wb"))
+        dump(self.scaler_y, open("./scaler_y.pkl", "wb"))
 
         # return scaled_x, scaled_y
         return scaled_data

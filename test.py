@@ -12,6 +12,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 import train
 import utils
 from create_models import create_model_stateful, rmse
+import create_models
 
 x_shape = (8384, 192, 21)
 y_shape = (8384, 192, 1)
@@ -40,9 +41,10 @@ for i in range(1, 13):
   test_past_st = train.df.index.get_loc(test_st)
   ttest2 = train.df.iloc[test_past_st - train.look_back : test_past_st, :]
 
-  test2_scaled = test_pipe.fit_transform(ttest2)
-  tx, ty = utils.get_X_y(X=test2_scaled, look_back=train.look_back, look_ahead=train.look_back, test_data=True)
-  # print("test_X", tx.shape)
+  test2_scaled = test_pipe.transform(ttest2)
+  print("Pipeline processed: ", test2_scaled.shape)
+  tx, ty = utils.get_X_y(X=test2_scaled, look_back=train.look_back, look_ahead=None, test_data=True)
+  print("test_X", tx.shape)
 
   test2_pred = pred_model.predict(tx, batch_size=1)
   test2_pred = scaler_y.inverse_transform(test2_pred)

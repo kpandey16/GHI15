@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler
 
 from create_models import run_model
 from dataTransformer import TimeStampFourierTransform, ColumnsSelectTransformer, ScaleTransformer, PreProcessData
@@ -23,14 +24,14 @@ train_end = "2019-12-31 23:45:00"
 trainset = df.loc[train_st:train_end, :]
 print("train set: ", trainset.shape)
 
-
 final_columns = Configs.cols + Configs.target
 
 processing_steps = []
 processing_steps.append(("PreProcess", PreProcessData()))
 processing_steps.append(("FourierTransform", TimeStampFourierTransform(colnames=None, max_val=None)))
 processing_steps.append(("SelectColumns", ColumnsSelectTransformer(columns=final_columns, )))
-processing_steps.append(("Scale", ScaleTransformer(target_col_name=Configs.target[0])))
+processing_steps.append(("Scale", ScaleTransformer(target_col_name=Configs.target[0], scaler_x=MinMaxScaler(feature_range=(0.01, 0.99)),
+                                                   scaler_y=MinMaxScaler(feature_range=(0.01, 0.99)))))
 
 # processing_steps.append(("TrainDataShape", TrainDataTransformer(look_ahead=2, look_back=2, targetName=None)))
 
@@ -39,10 +40,7 @@ look_back = 4 * 24 * 2
 look_ahead = 4 * 24 * 2
 
 
-
 def main():
-
-
     p1 = Pipeline(steps=processing_steps)
     scaled_data = p1.fit_transform(trainset)
     ## Save pipeline
@@ -72,6 +70,7 @@ def main():
     print("==============================================")
 
     run_model(x_train, y_train, y_valid=y_valid, x_valid=x_valid, batch_n=64, EPOCHS=2)
+
 
 if __name__ == "__main__":
     main()
